@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { useState, useEffect } from "react"
 import {
   DndContext, DragOverlay, PointerSensor,
@@ -885,6 +886,12 @@ export default function ShowcasePage() {
   return (
     <div className="min-h-screen overflow-x-auto bg-background">
       <div className="flex w-max flex-col gap-10 px-12 py-16">
+        <Link
+          href="/"
+          className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+        >
+          ← Back to Home
+        </Link>
         {rows.map((row, ri) => (
           <div key={ri} className="flex gap-10">
             {row.map((s) => (

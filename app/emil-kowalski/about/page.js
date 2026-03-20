@@ -1,5 +1,5 @@
 import Link from "next/link";
-import ToastDemo from "../components/ToastDemo";
+import ToastDemo from "@/app/components/ToastDemo";
 
 export default function About() {
   return (
@@ -26,10 +26,16 @@ export default function About() {
             Navigation
           </p>
           <Link
-            href="/"
+            href="/emil-kowalski"
             className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-zinc-700 underline-offset-4 hover:underline dark:text-zinc-300"
           >
             ← Home
+          </Link>
+          <Link
+            href="/"
+            className="inline-flex w-fit items-center gap-1.5 text-sm font-medium text-zinc-500 underline-offset-4 hover:underline dark:text-zinc-400"
+          >
+            ← Back to Home
           </Link>
         </div>
       </main>
