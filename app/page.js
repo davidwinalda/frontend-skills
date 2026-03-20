@@ -9,10 +9,10 @@ export default function Home() {
       <main className="flex w-full max-w-lg flex-col gap-10 px-8 py-24">
         <div className="flex flex-col gap-3">
           <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
-            Playground
+            Home
           </h1>
           <p className="text-sm leading-6 text-zinc-500 dark:text-zinc-400">
-            A Next.js sandbox for experimenting with UI components and animations.
+            UI components and interactions built with the <span className="font-medium text-zinc-700 dark:text-zinc-300">emil-design-eng</span> skill — exploring motion, micro-interactions, and thoughtful UI polish.
           </p>
         </div>
 

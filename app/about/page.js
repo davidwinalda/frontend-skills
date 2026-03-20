@@ -10,7 +10,7 @@ export default function About() {
             About
           </h1>
           <p className="text-sm leading-6 text-zinc-500 dark:text-zinc-400">
-            Navigate between pages to see the transition animation in action.
+            Navigate between pages to see the transition animation in action — an implementation of the <span className="font-medium text-zinc-700 dark:text-zinc-300">emil-design-eng</span> skill.
           </p>
         </div>
 
