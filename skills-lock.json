@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "skills": {
+    "emil-design-eng": {
+      "source": "emilkowalski/skill",
+      "sourceType": "github",
+      "computedHash": "32f63a1e56fc41f53497f7b19d6391b7c3e55bedd884c5a4d10bc4eacd2310e4"
+    },
+    "shadcn": {
+      "source": "shadcn/ui",
+      "sourceType": "github",
+      "computedHash": "507f011a70e8b3ae242bdc0bb5b39fd91a1d4049a0f3c281991ccf84973d591c"
+    }
+  }
+}
