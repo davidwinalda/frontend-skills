@@ -14,12 +14,15 @@ import { CSS } from "@dnd-kit/utilities"
 import {
   AreaChart, Area, BarChart, Bar,
   CartesianGrid, XAxis, YAxis,
+  PieChart, Pie,
 } from "recharts"
 import {
   Play, Pause, SkipBack, SkipForward,
   Shuffle, Repeat2, Volume2, BadgeCheck,
   Heart, MoreHorizontal, Disc3,
   Plus, Minus, ShoppingCart, X, ChevronUp,
+  Rocket, MessageSquare, GitMerge, AlertTriangle,
+  CheckCircle2, UserPlus, Star,
 } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -49,6 +52,11 @@ import {
 } from "@/components/ui/accordion"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { Calendar } from "@/components/ui/calendar"
+import {
+  Sheet, SheetContent, SheetHeader, SheetTitle,
+  SheetDescription, SheetFooter,
+} from "@/components/ui/sheet"
 
 // ─────────────────────────────────────────────────────────
 // Analytics data
@@ -854,8 +862,503 @@ function RestaurantMenuPage() {
 }
 
 // ─────────────────────────────────────────────────────────
+// Doctor Appointment Booking
+// ─────────────────────────────────────────────────────────
+
+const TIME_SLOTS = [
+  { time: "9:00 AM",  available: true,  period: "morning" },
+  { time: "9:30 AM",  available: true,  period: "morning" },
+  { time: "10:00 AM", available: false, period: "morning" },
+  { time: "10:30 AM", available: true,  period: "morning" },
+  { time: "11:00 AM", available: false, period: "morning" },
+  { time: "11:30 AM", available: true,  period: "morning" },
+  { time: "2:00 PM",  available: true,  period: "afternoon" },
+  { time: "2:30 PM",  available: false, period: "afternoon" },
+  { time: "3:00 PM",  available: true,  period: "afternoon" },
+  { time: "3:30 PM",  available: true,  period: "afternoon" },
+  { time: "4:00 PM",  available: false, period: "afternoon" },
+  { time: "4:30 PM",  available: true,  period: "afternoon" },
+]
+
+function DoctorBookingPage() {
+  const [selectedDate, setSelectedDate] = useState(undefined)
+  const [selectedSlot, setSelectedSlot] = useState(null)
+  const [sheetOpen, setSheetOpen] = useState(false)
+  const [name, setName] = useState("")
+  const [reason, setReason] = useState("")
+
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+
+  const morningSlots    = TIME_SLOTS.filter((s) => s.period === "morning")
+  const afternoonSlots  = TIME_SLOTS.filter((s) => s.period === "afternoon")
+
+  const formattedDate = selectedDate
+    ? selectedDate.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })
+    : ""
+
+  return (
+    <Card className="flex h-[720px] w-[480px] shrink-0 flex-col overflow-hidden p-0">
+      {/* Doctor Profile */}
+      <div className="border-b p-4">
+        <div className="flex items-start gap-3">
+          <Avatar className="size-14">
+            <AvatarFallback className="text-base font-semibold">EC</AvatarFallback>
+          </Avatar>
+          <div className="flex flex-1 flex-col gap-1.5">
+            <div className="flex items-start justify-between">
+              <div>
+                <p className="font-semibold">Dr. Emily Chen</p>
+                <p className="text-xs text-muted-foreground">Cardiologist · NYC Heart Clinic</p>
+              </div>
+              <Badge variant="secondary">Available</Badge>
+            </div>
+            <div className="flex items-center gap-0.5">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <Star
+                  key={i}
+                  className={cn(
+                    "size-3",
+                    i <= 4 ? "fill-foreground text-foreground" : "fill-none text-muted-foreground"
+                  )}
+                />
+              ))}
+              <span className="ml-1.5 text-xs font-medium">4.8</span>
+              <span className="text-xs text-muted-foreground">&nbsp;(127 reviews)</span>
+            </div>
+            <div className="flex gap-1.5">
+              <Badge variant="outline" className="text-[10px]">12 yrs exp</Badge>
+              <Badge variant="outline" className="text-[10px]">Cardiology</Badge>
+              <Badge variant="outline" className="text-[10px]">Mon – Fri</Badge>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Scrollable body */}
+      <div className="flex flex-1 flex-col overflow-y-auto">
+        {/* Calendar */}
+        <div className="border-b px-4 py-3">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+            Select Date
+          </p>
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={(d) => { setSelectedDate(d); setSelectedSlot(null) }}
+            disabled={(date) => date < today || date.getDay() === 0 || date.getDay() === 6}
+            className="mx-auto"
+          />
+        </div>
+
+        {/* Time Slots */}
+        {selectedDate && (
+          <div className="border-b px-4 py-3">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+              Select Time
+            </p>
+            <div className="flex flex-col gap-3">
+              <div>
+                <p className="mb-2 text-xs text-muted-foreground">Morning</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {morningSlots.map((slot) => (
+                    <Button
+                      key={slot.time}
+                      variant={selectedSlot === slot.time ? "default" : "outline"}
+                      size="sm"
+                      disabled={!slot.available}
+                      onClick={() => setSelectedSlot(slot.time)}
+                      className="text-xs"
+                    >
+                      {slot.time}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <p className="mb-2 text-xs text-muted-foreground">Afternoon</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {afternoonSlots.map((slot) => (
+                    <Button
+                      key={slot.time}
+                      variant={selectedSlot === slot.time ? "default" : "outline"}
+                      size="sm"
+                      disabled={!slot.available}
+                      onClick={() => setSelectedSlot(slot.time)}
+                      className="text-xs"
+                    >
+                      {slot.time}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Book button */}
+        <div className="p-4">
+          <Button
+            className="w-full"
+            disabled={!selectedDate || !selectedSlot}
+            onClick={() => setSheetOpen(true)}
+          >
+            Book Appointment
+          </Button>
+        </div>
+      </div>
+
+      {/* Confirmation Sheet */}
+      <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
+        <SheetContent side="bottom" className="rounded-t-2xl">
+          <div className="mx-auto w-full max-w-xl">
+            <SheetHeader>
+              <SheetTitle>Confirm Appointment</SheetTitle>
+              <SheetDescription>Review your details before confirming.</SheetDescription>
+            </SheetHeader>
+            <div className="flex flex-col gap-4 px-4 pb-2">
+              <div className="flex flex-col gap-2 rounded-xl border bg-muted/50 p-4">
+                {[
+                  { label: "Doctor",    value: "Dr. Emily Chen" },
+                  { label: "Specialty", value: "Cardiologist" },
+                  { label: "Date",      value: formattedDate },
+                  { label: "Time",      value: selectedSlot },
+                ].map(({ label, value }) => (
+                  <div key={label} className="flex items-center justify-between text-sm">
+                    <span className="text-muted-foreground">{label}</span>
+                    <span className="font-medium">{value}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="booking-name">Your Name</Label>
+                  <Input
+                    id="booking-name"
+                    placeholder="Full name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="booking-reason">Reason for Visit</Label>
+                  <Input
+                    id="booking-reason"
+                    placeholder="Brief description (optional)"
+                    value={reason}
+                    onChange={(e) => setReason(e.target.value)}
+                  />
+                </div>
+              </div>
+            </div>
+            <SheetFooter className="flex-row px-4">
+              <Button variant="outline" className="flex-1" onClick={() => setSheetOpen(false)}>Cancel</Button>
+              <Button className="flex-1" disabled={!name}>Confirm Booking</Button>
+            </SheetFooter>
+          </div>
+        </SheetContent>
+      </Sheet>
+    </Card>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
 // Section wrapper
 // ─────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────
+// Personal Finance Dashboard
+// ─────────────────────────────────────────────────────────
+
+const financeBarConfig = {
+  income:  { label: "Income",  color: "var(--chart-1)" },
+  expense: { label: "Expense", color: "var(--chart-2)" },
+}
+
+const incomeExpenseData = [
+  { month: "Jan", income: 4200, expense: 3100 },
+  { month: "Feb", income: 4200, expense: 3400 },
+  { month: "Mar", income: 4500, expense: 2900 },
+  { month: "Apr", income: 4200, expense: 3600 },
+  { month: "May", income: 4800, expense: 3200 },
+  { month: "Jun", income: 4200, expense: 2800 },
+]
+
+const spendingConfig = {
+  amount:    { label: "Amount" },
+  housing:   { label: "Housing",   color: "var(--chart-1)" },
+  food:      { label: "Food",      color: "var(--chart-2)" },
+  transport: { label: "Transport", color: "var(--chart-3)" },
+  shopping:  { label: "Shopping",  color: "var(--chart-4)" },
+  other:     { label: "Other",     color: "var(--chart-5)" },
+}
+
+const spendingData = [
+  { category: "housing",   label: "Housing",   amount: 1225, fill: "var(--color-housing)" },
+  { category: "food",      label: "Food",      amount: 770,  fill: "var(--color-food)" },
+  { category: "transport", label: "Transport", amount: 490,  fill: "var(--color-transport)" },
+  { category: "shopping",  label: "Shopping",  amount: 630,  fill: "var(--color-shopping)" },
+  { category: "other",     label: "Other",     amount: 385,  fill: "var(--color-other)" },
+]
+
+const BUDGETS = [
+  { name: "Food & Dining", spent: 770,  limit: 900 },
+  { name: "Shopping",      spent: 630,  limit: 500 },
+  { name: "Transport",     spent: 490,  limit: 600 },
+  { name: "Entertainment", spent: 120,  limit: 200 },
+]
+
+const TRANSACTIONS = [
+  { id: "t1", emoji: "🛒", merchant: "Whole Foods",     date: "Today, 2:30 PM", amount: -89.50,  category: "Groceries" },
+  { id: "t2", emoji: "🎬", merchant: "Netflix",         date: "Yesterday",      amount: -15.99,  category: "Entertainment" },
+  { id: "t3", emoji: "⛽", merchant: "Shell Gas",       date: "Yesterday",      amount: -52.30,  category: "Transport" },
+  { id: "t4", emoji: "💰", merchant: "Salary Deposit",  date: "Jun 1",          amount: 4200.00, category: "Income" },
+  { id: "t5", emoji: "🛍️", merchant: "Amazon",          date: "May 30",         amount: -124.00, category: "Shopping" },
+  { id: "t6", emoji: "☕", merchant: "Starbucks",       date: "May 29",         amount: -6.75,   category: "Food" },
+]
+
+function FinanceDashboard() {
+  return (
+    <Card className="flex h-[720px] w-[480px] shrink-0 flex-col overflow-hidden p-0">
+      {/* Net Worth */}
+      <div className="border-b p-4">
+        <div className="flex items-start justify-between">
+          <div className="flex flex-col gap-0.5">
+            <p className="text-xs text-muted-foreground">Net Worth</p>
+            <p className="text-2xl font-bold tracking-tight">$124,850</p>
+            <p className="text-xs text-muted-foreground">+$2,340 this month</p>
+          </div>
+          <Badge variant="secondary">+1.9% ↑</Badge>
+        </div>
+        <Separator className="my-3" />
+        <div className="flex gap-6">
+          <div>
+            <p className="text-xs text-muted-foreground">Assets</p>
+            <p className="text-sm font-semibold">$186,200</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Liabilities</p>
+            <p className="text-sm font-semibold">$61,350</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Savings Rate</p>
+            <p className="text-sm font-semibold">33%</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Charts row */}
+      <div className="flex border-b">
+        {/* Income vs Expense */}
+        <div className="flex flex-1 flex-col border-r p-3">
+          <p className="mb-1 text-xs font-medium">Income vs Expense</p>
+          <ChartContainer config={financeBarConfig} className="h-[130px] w-full">
+            <BarChart data={incomeExpenseData} barCategoryGap="30%" barGap={2}>
+              <CartesianGrid vertical={false} strokeDasharray="3 3" />
+              <XAxis dataKey="month" tick={{ fontSize: 9 }} tickLine={false} axisLine={false} />
+              <ChartTooltip content={<ChartTooltipContent />} />
+              <Bar dataKey="income"  fill="var(--color-income)"  radius={[2, 2, 0, 0]} />
+              <Bar dataKey="expense" fill="var(--color-expense)" radius={[2, 2, 0, 0]} />
+            </BarChart>
+          </ChartContainer>
+        </div>
+
+        {/* Spending Donut */}
+        <div className="flex w-[170px] flex-col p-3">
+          <p className="mb-1 text-xs font-medium">Spending</p>
+          <ChartContainer config={spendingConfig} className="mx-auto aspect-square max-h-[110px]">
+            <PieChart>
+              <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+              <Pie data={spendingData} dataKey="amount" nameKey="category" innerRadius={28} strokeWidth={2} />
+            </PieChart>
+          </ChartContainer>
+          <div className="mt-1.5 flex flex-col gap-0.5">
+            {spendingData.map((d, i) => (
+              <div key={d.category} className="flex items-center gap-1.5">
+                <div className="size-2 shrink-0 rounded-full" style={{ background: `var(--chart-${i + 1})` }} />
+                <span className="truncate text-[10px] text-muted-foreground">{d.label}</span>
+                <span className="ml-auto text-[10px] font-medium">${d.amount}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Budget Progress */}
+      <div className="border-b px-4 py-3">
+        <p className="mb-2.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Budget</p>
+        <div className="flex flex-col gap-2.5">
+          {BUDGETS.map((b) => {
+            const pct = Math.round((b.spent / b.limit) * 100)
+            const over = b.spent > b.limit
+            return (
+              <div key={b.name} className="flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs">{b.name}</span>
+                  <span className={cn("text-xs", over ? "text-destructive" : "text-muted-foreground")}>
+                    ${b.spent} / ${b.limit}{over && " · over budget"}
+                  </span>
+                </div>
+                <Progress value={Math.min(pct, 100)} />
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Recent Transactions */}
+      <div className="flex flex-1 flex-col overflow-hidden px-4 py-3">
+        <p className="mb-2.5 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Recent Transactions</p>
+        <div className="flex flex-col gap-2.5 overflow-y-auto">
+          {TRANSACTIONS.map((t) => (
+            <div key={t.id} className="flex items-center gap-3">
+              <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-sm">
+                {t.emoji}
+              </div>
+              <div className="flex min-w-0 flex-1 flex-col">
+                <span className="truncate text-sm font-medium">{t.merchant}</span>
+                <span className="text-xs text-muted-foreground">{t.date}</span>
+              </div>
+              <div className="flex shrink-0 flex-col items-end gap-1">
+                <span className="text-sm font-semibold">
+                  {t.amount > 0 ? "+" : ""}${Math.abs(t.amount).toFixed(2)}
+                </span>
+                <Badge variant="secondary" className="text-[10px]">{t.category}</Badge>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Card>
+  )
+}
+
+// ─────────────────────────────────────────────────────────
+// Activity Timeline
+// ─────────────────────────────────────────────────────────
+
+const TIMELINE_EVENTS = [
+  {
+    id: "1",
+    type: "deploy",
+    icon: Rocket,
+    iconClass: "text-primary bg-primary/10",
+    user: { name: "Sarah Chen", initials: "SC" },
+    action: "deployed",
+    target: "v2.4.1 to production",
+    time: "2 min ago",
+    details: "Build #482 passed all checks\n3 services updated\nZero-downtime rollout completed",
+  },
+  {
+    id: "2",
+    type: "comment",
+    icon: MessageSquare,
+    iconClass: "text-foreground bg-accent",
+    user: { name: "Alex Rivera", initials: "AR" },
+    action: "commented on",
+    target: "PR #94 — Dark mode",
+    time: "18 min ago",
+    details: "Looks good overall! Left a few inline comments on the CSS variable naming. LGTM once those are addressed.",
+  },
+  {
+    id: "3",
+    type: "merge",
+    icon: GitMerge,
+    iconClass: "text-primary bg-primary/10",
+    user: { name: "Jordan Kim", initials: "JK" },
+    action: "merged",
+    target: "feat/auth-refresh → main",
+    time: "1 hr ago",
+    details: "+247 / −89 lines\n12 files changed\nAll checks passed",
+  },
+  {
+    id: "4",
+    type: "alert",
+    icon: AlertTriangle,
+    iconClass: "text-destructive bg-destructive/10",
+    user: { name: "System", initials: "SY" },
+    action: "triggered alert on",
+    target: "API p95 latency spike",
+    time: "2 hr ago",
+    details: "p95 latency exceeded 800ms threshold\nAffected: /api/search endpoint\nAuto-resolved after 4 minutes",
+  },
+  {
+    id: "5",
+    type: "task",
+    icon: CheckCircle2,
+    iconClass: "text-muted-foreground bg-muted",
+    user: { name: "Maya Patel", initials: "MP" },
+    action: "completed",
+    target: "Migrate legacy auth tokens",
+    time: "3 hr ago",
+    details: null,
+  },
+  {
+    id: "6",
+    type: "join",
+    icon: UserPlus,
+    iconClass: "text-muted-foreground bg-muted",
+    user: { name: "Chris Wong", initials: "CW" },
+    action: "joined the team as",
+    target: "Frontend Engineer",
+    time: "Yesterday",
+    details: null,
+  },
+]
+
+function ActivityTimeline() {
+  return (
+    <Card className="flex h-[520px] w-[380px] shrink-0 flex-col overflow-hidden">
+      <CardHeader className="border-b pb-3">
+        <CardTitle>Activity</CardTitle>
+        <CardDescription>Recent team events</CardDescription>
+      </CardHeader>
+      <CardContent className="flex-1 overflow-y-auto p-0">
+        <div className="flex flex-col">
+          {TIMELINE_EVENTS.map((event, i) => {
+            const Icon = event.icon
+            return (
+              <div key={event.id} className="relative flex gap-3 px-4 py-3">
+                {i < TIMELINE_EVENTS.length - 1 && (
+                  <div className="absolute left-[1.875rem] top-10 bottom-0 w-px bg-border" />
+                )}
+                <div className={cn("relative z-10 flex size-7 shrink-0 items-center justify-center rounded-full", event.iconClass)}>
+                  <Icon className="size-3.5" />
+                </div>
+                <div className="flex min-w-0 flex-1 flex-col gap-1.5 pt-0.5">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="size-5">
+                      <AvatarFallback className="text-[10px]">{event.user.initials}</AvatarFallback>
+                    </Avatar>
+                    <span className="truncate text-sm font-medium">{event.user.name}</span>
+                    <Badge variant="secondary" className="ml-auto shrink-0 text-[10px]">{event.type}</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {event.action}{" "}
+                    <span className="font-medium text-foreground">{event.target}</span>
+                  </p>
+                  <span className="text-xs text-muted-foreground">{event.time}</span>
+                  {event.details && (
+                    <Accordion type="single" collapsible className="w-full">
+                      <AccordionItem value="details" className="border-0">
+                        <AccordionTrigger className="py-0 text-xs text-muted-foreground hover:no-underline">
+                          View details
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-2">
+                          <pre className="whitespace-pre-wrap rounded-md bg-muted px-3 py-2 text-xs leading-relaxed">{event.details}</pre>
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  )}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
 
 function Section({ label, children }) {
   return (
@@ -876,7 +1379,10 @@ const SECTIONS = [
   { label: "Kanban board",         content: <KanbanBoard /> },
   { label: "Analytics dashboard",  content: <AnalyticsDashboard /> },
   { label: "Artist page",          content: <ArtistPage /> },
-  { label: "Restaurant menu",       content: <RestaurantMenuPage /> },
+  { label: "Restaurant menu",      content: <RestaurantMenuPage /> },
+  { label: "Activity timeline",    content: <ActivityTimeline /> },
+  { label: "Finance dashboard",    content: <FinanceDashboard /> },
+  { label: "Doctor booking",       content: <DoctorBookingPage /> },
 ]
 
 export default function ShowcasePage() {
