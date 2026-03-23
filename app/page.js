@@ -13,6 +13,12 @@ const SKILLS = [
     description:
       "Component showcase with login form, dialog, kanban board, analytics dashboard, artist page, and restaurant menu.",
   },
+  {
+    href: "/jakubkrehel-and-ibelick",
+    label: "Jakubkrehel & Ibelick Skills",
+    description:
+      "Light app dashboard with collapsible sidebar — concentric radii, staggered enters, tabular numbers, shadows over borders, and scale-on-press.",
+  },
 ];
 
 export default function RootPage() {
