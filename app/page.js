@@ -15,9 +15,9 @@ const SKILLS = [
   },
   {
     href: "/jakubkrehel-and-ibelick",
-    label: "Jakubkrehel & Ibelick Skills",
+    label: "make-interfaces-feel-better by jakubkrehel & ui-skills by ibelick",
     description:
-      "Light app dashboard with collapsible sidebar — concentric radii, staggered enters, tabular numbers, shadows over borders, and scale-on-press.",
+      "Light app dashboard with collapsible sidebar, concentric radii, staggered enters, tabular numbers, shadows over borders, and scale-on-press.",
   },
 ];
 
